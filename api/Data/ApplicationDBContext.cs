@@ -19,9 +19,22 @@ namespace api.Data
         //tables 
         public DbSet<Stock> Stocks { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Portfolio> Portfolios { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Portfolio>(x => x.HasKey(k => new { k.UserId, k.StockId }));
+
+            modelBuilder.Entity<Portfolio>()
+                .HasOne(u => u.User)
+                .WithMany(u => u.Portfolios)
+                .HasForeignKey(k => k.UserId);
+
+            modelBuilder.Entity<Portfolio>()
+                .HasOne(u => u.Stock)
+                .WithMany(u => u.Portfolios)
+                .HasForeignKey(k => k.StockId);
 
             modelBuilder.Entity<Comment>()
                 .HasOne(c => c.Stock)

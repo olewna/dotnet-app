@@ -9,5 +9,6 @@ namespace api.Models
     public class User : IdentityUser
     {
         // password jest wbudowane z IdentityUser
+        public List<Portfolio> Portfolios { get; set; } = new List<Portfolio>();
     }
 }
