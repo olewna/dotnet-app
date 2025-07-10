@@ -36,5 +36,41 @@ namespace api.Controllers
             var result = userPortfolio.Select(x => x.ToStockDto());
             return Ok(result); //TODO nie zwraca komentarzy do stocków
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> Create(string symbol)
+        {
+            var username = User.GetUsername();
+            var user = await _userManager.FindByNameAsync(username);
+            var stock = await _stockRepository.GetBySymbolAsync(symbol);
+
+            if (stock == null)
+            {
+                return BadRequest("Stock not found");
+            }
+
+            var userPortfolio = await _portfolioRepository.GetUserPortfolio(user);
+
+            if (userPortfolio.Any(x => x.Symbol.ToLower() == symbol.ToLower()))
+            {
+                return BadRequest("Cannot add same portfolio");
+            }
+
+            var portfolioModel = new Portfolio
+            {
+                StockId = stock.Id,
+                UserId = user.Id,
+            };
+
+            await _portfolioRepository.CreateAsync(portfolioModel);
+
+            if (portfolioModel == null)
+            {
+                return StatusCode(500, "Could not create");
+            }
+
+            return Created();
+        }
     }
 }
