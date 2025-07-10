@@ -18,11 +18,6 @@ namespace api.Controllers
     public class StockController : ControllerBase
     {
         private readonly IStockRepository _stockRepository;
-        // private readonly ApplicationDBContext _context;
-        // public StockController(ApplicationDBContext context)
-        // {
-        //     _context = context;
-        // }
         public StockController(IStockRepository stockRepository) // dependency injection
         {
             _stockRepository = stockRepository;
@@ -38,7 +33,9 @@ namespace api.Controllers
             }
 
             var stocks = await _stockRepository.GetAllAsync(query);
-            var stockDto = stocks.Select(stock => stock.ToStockDto()); // ważne żeby dawać ToList 
+
+            var stockDto = stocks.Select(stock => stock.ToStockDto()).ToList(); // ważne żeby dawać ToList 
+
             return Ok(stockDto);
         }
 
